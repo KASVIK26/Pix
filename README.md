@@ -21,16 +21,19 @@ Pix is a React Native application built with [Expo](https://expo.dev) that allow
 > Add screenshots of your app here.
 
 - **Welcome Screen**  
-  ![Welcome Screen](placeholder-for-image)
+ ![Screenshot 2025-05-12 204045](https://github.com/user-attachments/assets/538b2c17-1622-4f31-8cc0-7fad8f71ddd8)
+
 
 - **Home Screen**  
-  ![Home Screen](placeholder-for-image)
+  ![Screenshot 2025-05-12 204112](https://github.com/user-attachments/assets/8437790b-222f-4491-b01d-77185cdd35bc)
 
 - **Filters Modal**  
-  ![Filters Modal](placeholder-for-image)
+  ![Screenshot 2025-05-12 204457](https://github.com/user-attachments/assets/ee080ba7-8200-4009-a7bc-3a252307a385)
+
 
 - **Image Details**  
-  ![Image Details](placeholder-for-image)
+  ![Screenshot 2025-05-12 204955](https://github.com/user-attachments/assets/b396c434-7526-4295-bfac-c6c78eb11bba)
+
 
 ---
 
@@ -149,8 +152,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 For any questions or feedback, feel free to reach out:
 
-- **Email**: [your-email@example.com](mailto:your-email@example.com)
-- **GitHub**: [Your GitHub Profile](https://github.com/your-profile)
+
+- **GitHub**: [Your GitHub Profile](https://github.com/KASVIK26)
 
 ---
 
