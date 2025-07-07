@@ -1,4 +1,4 @@
-import { Feather, FontAwesome, FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { Feather, FontAwesome, FontAwesome6, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,12 +11,16 @@ import debounce from 'lodash.debounce';
 import { set } from 'lodash';
 import FiltersModal from '../../components/filtersModal.js';
 import { useRouter } from 'expo-router';
+import { storageManager } from '../../helpers/storage';
+import Toast from 'react-native-toast-message';
+import { useThemedStyles } from '../../hooks/useThemedStyles';
 
 var page = 1;
 const HomeScreen = () => {
     const {top} = useSafeAreaInsets();
     const paddingTop = top>0 ? top+10 : 30;
     const [search,setsearch] = useState('');
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
     const searchInputRef = useRef(null);
     const [images,setImages] = useState([]);
     const [filters, setFilters] = useState(null);
@@ -25,6 +29,7 @@ const HomeScreen = () => {
     const scrollRef = useRef(null);
     const [isEndReached, setisEndReached] = useState(false);
     const router = useRouter();
+    const { colors, isDark } = useThemedStyles();
 
     useEffect(() => {
       fetchImages();
@@ -152,15 +157,26 @@ const HomeScreen = () => {
 
 console.log(filters);
   return (
-    <View style={[styles.container, {paddingTop}]}>
+    <View style={[styles.container, {paddingTop, backgroundColor: colors.background}]}>
       {/* header  */}
       <View style ={[styles.header]}>
         <Pressable onPress={handleScrollUp}>
-            <Text style={styles.title}>Pixels</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Pixels</Text>
         </Pressable>
-        <Pressable onPress={openfiltersModal}>
-            <FontAwesome6 name="bars-staggered" size={22} color={theme.colors.neutral(0.7)} />
-        </Pressable>
+        <View style={styles.headerActions}>
+          <Pressable onPress={() => router.push('/favorites')} style={[styles.actionButton, { backgroundColor: colors.surface }]}>
+            <Ionicons name="heart" size={22} color={colors.textSecondary} />
+          </Pressable>
+          <Pressable onPress={() => router.push('/collections')} style={[styles.actionButton, { backgroundColor: colors.surface }]}>
+            <MaterialIcons name="collections" size={22} color={colors.textSecondary} />
+          </Pressable>
+          <Pressable onPress={() => router.push('/settings')} style={[styles.actionButton, { backgroundColor: colors.surface }]}>
+            <Ionicons name="settings" size={22} color={colors.textSecondary} />
+          </Pressable>
+          <Pressable onPress={openfiltersModal} style={[styles.actionButton, { backgroundColor: colors.surface }]}>
+            <FontAwesome6 name="bars-staggered" size={22} color={colors.textSecondary} />
+          </Pressable>
+        </View>
       </View>
       <ScrollView onScroll={handleScroll}
       scrollEventThrottle={5}
@@ -168,21 +184,31 @@ console.log(filters);
       contentContainerStyle={{gap: 15}}
       >
       {/* search bar  */}
-    <View style={styles.searchBar}>
+    <View style={[
+      styles.searchBar, 
+      { 
+        backgroundColor: colors.surface, 
+        borderColor: isSearchFocused ? (isDark ? '#888888' : colors.accent) : colors.border,
+        borderWidth: isSearchFocused ? 2 : 1.5,
+      }
+    ]}>
         <View style={styles.searchIcon}>
-          <Feather name="search" size={24} color={theme.colors.neutral(0.4)} />
+          <Feather name="search" size={24} color={colors.textSecondary} />
         </View>
         <TextInput
         placeholder='Search for photos...'
+        placeholderTextColor={colors.textSecondary}
         //value={search}
         ref={searchInputRef}
         onChangeText={handleTextDebounce}
-        style={styles.searchInput}
+        onFocus={() => setIsSearchFocused(true)}
+        onBlur={() => setIsSearchFocused(false)}
+        style={[styles.searchInput, { color: colors.text }]}
         />
         {
             search &&(
-                <Pressable onPress={() => handleSearch("")} style={styles.closeIcon}>
-                    <Ionicons name="close" size={24} color={theme.colors.neutral(0.6)} />    
+                <Pressable onPress={() => handleSearch("")} style={[styles.closeIcon, { backgroundColor: colors.surface }]}>
+                    <Ionicons name="close" size={24} color={colors.textSecondary} />    
                 </Pressable>
             )
         }
@@ -199,17 +225,17 @@ console.log(filters);
               {
                 Object.keys(filters).map((key,index) => {
                   return(
-                    <View key={index} style={styles.filterItem}>
+                    <View key={index} style={[styles.filterItem, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                       {
                         key == 'colors' ?(
                           <View style={{height: 20, width: 30, borderRadius: 7, backgroundColor: filters[key]}} />
                         ):(
-                          <Text style={styles.filterItemText}>{filters[key]}</Text>
+                          <Text style={[styles.filterItemText, { color: colors.text }]}>{filters[key]}</Text>
                         )
                       }
                       
-                      <Pressable style = {styles.filterCloseIcon} onPress={() => clearThisFilter(key)}>
-                        <Ionicons name="close" size={14} color={theme.colors.neutral(0.9)} />
+                      <Pressable style={[styles.filterCloseIcon, { backgroundColor: colors.accent }]} onPress={() => clearThisFilter(key)}>
+                        <Ionicons name="close" size={14} color={colors.background} />
                       </Pressable> 
                     </View>
                   )
@@ -235,7 +261,8 @@ console.log(filters);
       setFilters={setFilters} 
       onClose={closeFiltersModal}
       onApply={applyFilters}
-      onReset={resetFilters}/>
+      onReset={resetFilters}
+      colors={colors}/>
      </View>
   );
 };
@@ -251,6 +278,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  actionButton: {
+    padding: 8,
+    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.neutral(0.05),
+  },
   title: {
     fontSize: hp(4),
     fontWeight: 'bold',
@@ -261,31 +298,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.grayBG,
-    borderRadius: theme.radius.lg,
-    backgroundColor: 'white',
-    padding: 6,
-    paddingLeft: 10,
-    
+    borderWidth: 1.5,
+    borderRadius: theme.radius.xl,
+    padding: 8,
+    paddingLeft: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   searchIcon: {
     padding: 8,
-    
   },
   closeIcon: {
-    backgroundColor: theme.colors.neutral(0.1),
     padding: 8,
     borderRadius: theme.radius.sm,
-   
   },
   searchInput: {
     flex: 1,
     borderRadius: theme.radius.sm,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     fontSize: hp(1.8),
+    outlineStyle: 'none', // Remove focus outline on web
+    borderWidth: 0, // Remove any default border
+    minHeight: 40, // Better touch target for mobile
   },
-  
   filters: {
     gap: 10,
     marginHorizontal: wp(4),
@@ -296,20 +338,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     padding: 8,
-    
     paddingHorizontal: 10,
     borderRadius: theme.radius.xs,
-    backgroundColor: theme.colors.neutral(0.05),
+    minHeight: 36, // Better touch target
   },
   filterItemText: {
     fontSize: hp(1.9),
+    fontWeight: '500',
   },
   filterCloseIcon: {
-    backgroundColor: theme.colors.neutral(0.1),
     padding: 4,
     borderRadius: 7,
+    minWidth: 24,
+    minHeight: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-
-  
 })
 export default HomeScreen;
