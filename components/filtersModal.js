@@ -16,6 +16,7 @@ import { useThemedStyles } from '../hooks/useThemedStyles';
 
 const FiltersModal = ({ modalRef,onClose, onApply,onReset,filters,setFilters, colors: propColors }) => {
     const { colors, isDark } = useThemedStyles();
+    
     // Use passed colors or fall back to theme colors
     const modalColors = propColors || colors;
 
@@ -31,7 +32,7 @@ const FiltersModal = ({ modalRef,onClose, onApply,onReset,filters,setFilters, co
             handleIndicatorStyle={{ backgroundColor: modalColors.border }}
         // onChange={handleSheetChanges}
         >
-            <BottomSheetView style={[styles.contentContainer, { backgroundColor: modalColors.surface }]}> 
+            <BottomSheetView style={[styles.contentContainer, { backgroundColor: modalColors.surface }]}>
                 <View style={styles.content}>
                 <Text style={[styles.filterText, { color: modalColors.text }]}>Filters</Text>
                 {
