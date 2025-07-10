@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View, Platform } from 'react-native'
 import React, { useMemo } from 'react'
 import {
     BottomSheetModal,
@@ -11,6 +11,7 @@ import { theme } from '../constants/theme';
 import { ColorFilter, CommonFilterRow, SectionView } from './filterViews';
 import { data } from '../constants/data';
 import { useThemedStyles } from '../hooks/useThemedStyles';
+import { Ionicons } from '@expo/vector-icons';
 
 
 
@@ -20,7 +21,48 @@ const FiltersModal = ({ modalRef,onClose, onApply,onReset,filters,setFilters, co
     // Use passed colors or fall back to theme colors
     const modalColors = propColors || colors;
 
-    const snapPoints = useMemo(() => ['85%'], []);
+    // Custom handle indicator that closes modal on press
+    const CustomHandle = () => (
+        <Pressable
+            onPress={() => modalRef.current?.close()}
+            style={{ alignItems: 'center', paddingVertical: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel="Close filter modal"
+        >
+            <View style={{
+                width: 60,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: modalColors.border,
+                marginBottom: 4,
+            }} />
+        </Pressable>
+    );
+
+    // Fix scroll lock on web when modal closes (for all close types)
+    const unlockScroll = () => {
+        if (Platform.OS === 'web' && typeof document !== 'undefined') {
+            document.body.style.overflow = '';
+        }
+    };
+
+    // Called when modal is dismissed (programmatically or by backdrop)
+    const handleClose = () => {
+        if (typeof onClose === 'function') onClose();
+        unlockScroll();
+    };
+
+    // Called on any modal state change (including drag down)
+    const handleSheetChange = (index) => {
+        if (index === -1) {
+            // Delay to ensure BottomSheet has finished closing before unlocking scroll
+            setTimeout(unlockScroll, 100);
+        }
+    };
+
+    // Use a larger snap point for mobile devices so the modal opens fully
+    const isMobile = Platform.OS !== 'web' && Platform.OS !== 'windows' && Platform.OS !== 'macos';
+    const snapPoints = useMemo(() => [isMobile ? '99%' : '85%'], [isMobile]);
     return (
         <BottomSheetModal
             ref={modalRef}
@@ -30,11 +72,23 @@ const FiltersModal = ({ modalRef,onClose, onApply,onReset,filters,setFilters, co
             backdropComponent={CustomBackdrop}
             backgroundStyle={{ backgroundColor: modalColors.surface }}
             handleIndicatorStyle={{ backgroundColor: modalColors.border }}
-        // onChange={handleSheetChanges}
+            handleComponent={CustomHandle}
+            onDismiss={handleClose}
+            onChange={handleSheetChange}
         >
-            <BottomSheetView style={[styles.contentContainer, { backgroundColor: modalColors.surface }]}>
+            <BottomSheetView style={[styles.contentContainer, { backgroundColor: modalColors.surface }]}> 
+                <View style={styles.headerRow}>
+                    <Text style={[styles.filterText, { color: modalColors.text }]}>Filters</Text>
+                    <Pressable
+                        onPress={() => modalRef.current?.close()}
+                        style={styles.closeIcon}
+                        accessibilityRole="button"
+                        accessibilityLabel="Close filter modal"
+                    >
+                        <Ionicons name="close" size={28} color={modalColors.text} />
+                    </Pressable>
+                </View>
                 <View style={styles.content}>
-                <Text style={[styles.filterText, { color: modalColors.text }]}>Filters</Text>
                 {
                     Object.keys(sections).map((sectionName, index) => {
                         let sectionView = sections[sectionName];
@@ -143,11 +197,29 @@ const styles = StyleSheet.create({
         maxWidth: 600, // Max width for larger screens
         alignSelf: 'center',
     },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center', // Center content horizontally
+        width: '100%',
+        marginBottom: 10,
+        position: 'relative',
+        minHeight: 48, // Ensure enough height for icon
+    },
     filterText: {
         fontSize: hp(4),
         fontWeight: 'bold',
-        marginBottom: 10,
         textAlign: 'center',
+        flex: 1,
+    },
+    closeIcon: {
+        position: 'absolute',
+        right: 0,
+        top: '50%',
+        transform: [{ translateY: -14 }], // Center vertically (icon is 28px)
+        paddingVertical: 8,
+        paddingHorizontal: wp(3), // Dynamic horizontal padding
+        zIndex: 2,
     },
     buttons: {
         flexDirection: 'row',
@@ -178,5 +250,5 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: hp(2.2),
         fontWeight: '600',
-    }
+    },
 })
