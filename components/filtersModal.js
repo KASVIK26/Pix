@@ -184,18 +184,21 @@ const styles = StyleSheet.create({
     contentContainer: {
         flex: 1,
         alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '100%',
     },
     overlay: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     content: {
-        flex: 1,
+        flexGrow: 1,
         gap: 15,
         width: '100%',
         paddingVertical: 10,
         paddingHorizontal: wp(4),
         maxWidth: 600, // Max width for larger screens
         alignSelf: 'center',
+        justifyContent: 'flex-start',
     },
     headerRow: {
         flexDirection: 'row',
