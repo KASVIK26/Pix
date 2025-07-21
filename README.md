@@ -162,5 +162,3 @@ For any questions or feedback, feel free to reach out:
 - [React Native](https://reactnative.dev) for the framework.
 
 ---
-
-> Add any additional sections or details as needed.
