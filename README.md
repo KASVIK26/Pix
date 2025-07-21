@@ -18,8 +18,6 @@ Pix is a React Native application built with [Expo](https://expo.dev) that allow
 
 ## Screenshots 📱
 
-> Add screenshots of your app here.
-
 - **Welcome Screen**  
  ![Screenshot 2025-05-12 204045](https://github.com/user-attachments/assets/538b2c17-1622-4f31-8cc0-7fad8f71ddd8)
 
